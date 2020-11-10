@@ -58,11 +58,26 @@ def create_user_id(name, email,data):
 
     return user
 
-@app.route('/users')
+@app.route('/users',methods=['GET', 'POST'])
 def users():
-    #return jsonify({'tasks': tasks})
-    userDetails = ["My_computer", "lol"]
-    return render_template('users.html', userDetails=userDetails)
+    if request.method == 'GET':
+        return render_template('userdetails.html')
+    if request.method == 'POST':
+        userid = request.form
+        userid = userid["userid"]
+        storage_path = 'filtered_data_file.json'
+        with open(storage_path, 'r') as f:
+            try:
+                users_data = json.load(f)
+                print('loaded that: ', users_data)
+            except Exception as e:
+                print("got %s on json.load()" % e)
+        userdetails = 'No Record Found'
+        for user in users_data:
+            if userid == str(user['id']):
+                userdetails = user
+        return render_template('show.html', userdetails=userdetails)
+
 
 if __name__ == '__main__':
     app.run()
